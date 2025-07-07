@@ -1,0 +1,23 @@
+{
+	"name": "server",
+	"main": "./dist/index.js",
+	"scripts": {
+		"dev": "cross-env MODE=development ts-node-dev --respawn --transpile-only --clear ./src/index.ts",
+		"prod": "npm install && tsc && cross-env MODE=production node dist/index.js"
+	},
+	"dependencies": {
+		"cors": "^2.8.5",
+		"cross-env": "^7.0.3",
+		"express": "^5.1.0",
+		"fs": "^0.0.1-security",
+		"path": "^0.12.7",
+		"pg": "^8.16.3",
+		"reflect-metadata": "^0.2.2",
+		"typeorm": "^0.3.25"
+	},
+	"devDependencies": {
+		"@types/cors": "^2.8.19",
+		"@types/express": "^5.0.3",
+		"@types/node": "^24.0.10"
+	}
+}

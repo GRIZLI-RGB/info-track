@@ -1,0 +1,45 @@
+# Node.js
+**/node_modules/
+**/package-lock.json
+**/yarn.lock
+**/pnpm-lock.yaml
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/pnpm-debug.log*
+
+# Logs
+**/*.log
+**/logs/
+**/log/
+
+# dotenv environment variables (любого уровня)
+**/.env*
+ 
+# OS-specific files
+**/.DS_Store
+**/Thumbs.db
+
+# Next.js build
+**/.next/
+**/.turbo/
+**/out/
+**/.vercel/
+
+# Build (например, от TypeScript или Babel)
+**/dist/
+**/build/
+**/.next
+
+# IDE configs
+**/.vscode/
+**/.idea/
+**/*.sw?
+
+# Test coverage
+**/coverage/
+
+# Temporary files
+**/*.swp
+**/*.swo
+**/*.tmp
