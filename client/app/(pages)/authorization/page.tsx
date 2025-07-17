@@ -33,7 +33,7 @@ export default function AuthPage() {
 					password: form.password,
 				});
 				localStorage.setItem("token", data.token);
-				router.push("/");
+				router.push("/news");
 			}
 			// eslint-disable-next-line
 		} catch (err: any) {

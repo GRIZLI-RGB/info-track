@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 import { AppDataSource } from "./configs/database";
-import { User } from "./entities";
+import { Channel, ChannelUser, News, User } from "./entities";
 
 const router = Router();
 
@@ -106,6 +106,130 @@ router.post("/auth/reject/:id", async (req: Request, res: Response) => {
 	await repo.save(user);
 
 	res.json({ message: "Пользователь отклонён" });
+});
+
+router.post("/channels", async (req: Request, res: Response) => {
+	const { name, adminId, userIds } = req.body;
+
+	if (!name || !adminId || !Array.isArray(userIds)) {
+		res.status(400).json({ message: "Неверные параметры" });
+		return;
+	}
+
+	const userRepo = AppDataSource.getRepository(User);
+	const admin = await userRepo.findOneBy({ id: adminId });
+
+	if (!admin) {
+		res.status(404).json({ message: "Администратор не найден" });
+		return;
+	}
+
+	const channelRepo = AppDataSource.getRepository(Channel);
+	const channel = channelRepo.create({ name, admin });
+	await channelRepo.save(channel);
+
+	const cuRepo = AppDataSource.getRepository(ChannelUser);
+	for (const userId of userIds) {
+		const user = await userRepo.findOneBy({ id: userId });
+		if (user) {
+			const cu = cuRepo.create({ user, channel });
+			await cuRepo.save(cu);
+		}
+	}
+
+	res.status(201).json({ message: "Канал создан" });
+});
+
+router.get("/users/approved", async (_: Request, res: Response) => {
+	const users = await AppDataSource.getRepository(User).findBy({
+		status: "approved",
+	});
+
+	res.json(users);
+});
+
+router.post("/news", async (req: Request, res: Response) => {
+	const { title, content, channelId, startsAt, endsAt, authorId } = req.body;
+
+	if (!title || !content || !channelId || !startsAt || !authorId) {
+		res.status(400).json({ message: "Необходимые поля не заполнены" });
+		return;
+	}
+
+	const channelRepo = AppDataSource.getRepository(Channel);
+	const authorRepo = AppDataSource.getRepository(User);
+	const newsRepo = AppDataSource.getRepository(News);
+
+	const channel = await channelRepo.findOneBy({ id: channelId });
+	const author = await authorRepo.findOneBy({ id: authorId });
+
+	if (!channel || !author) {
+		res.status(404).json({ message: "Канал или автор не найден" });
+		return;
+	}
+
+	const news = newsRepo.create({
+		title,
+		content,
+		channel,
+		author,
+		startsAt: new Date(startsAt),
+		endsAt: endsAt ? new Date(endsAt) : null,
+	}) as Partial<News>;
+
+	await newsRepo.save(news);
+
+	res.status(201).json({ message: "Новость опубликована" });
+});
+
+router.get("/news", async (req: Request, res: Response) => {
+	const { channelId } = req.query;
+
+	if (!channelId) {
+		res.status(400).json({ message: "Укажите ID канала" });
+		return;
+	}
+
+	const newsList = await AppDataSource.getRepository(News).find({
+		where: {
+			channel: { id: +channelId },
+		},
+		relations: ["author"],
+		order: {
+			startsAt: "DESC",
+		},
+	});
+
+	res.json(newsList);
+});
+
+router.get("/auth/me", async (req: Request, res: Response) => {
+	const auth = req.headers.authorization;
+
+	if (!auth || !auth.startsWith("Bearer ")) {
+		res.status(401).json({ message: "Нет токена" });
+		return;
+	}
+
+	const token = auth.replace("Bearer ", "");
+	let decoded: any;
+	try {
+		decoded = jwt.verify(token, process.env.JWT_SECRET || "secret");
+	} catch {
+		res.status(401).json({ message: "Невалидный токен" });
+		return;
+	}
+
+	const user = await AppDataSource.getRepository(User).findOneBy({
+		id: decoded.userId,
+	});
+
+	if (!user) {
+		res.status(404).json({ message: "Пользователь не найден" });
+		return;
+	}
+
+	res.json(user);
 });
 
 export default router;

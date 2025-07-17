@@ -119,12 +119,7 @@
 // 	responseDate: Date;
 // }
 
-import {
-	Entity,
-	PrimaryGeneratedColumn,
-	Column,
-	CreateDateColumn,
-} from "typeorm";
+import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from "typeorm";
 import { BaseEntity } from "./configs/database";
 
 @Entity()
@@ -143,4 +138,48 @@ export class User extends BaseEntity {
 
 	@Column({ default: "pending" })
 	status: "pending" | "approved" | "rejected";
+}
+
+@Entity()
+export class Channel extends BaseEntity {
+	@Column()
+	name: string;
+
+	@ManyToOne(() => User)
+	admin: User;
+
+	@OneToMany(() => ChannelUser, (cu) => cu.channel)
+	channelUsers: ChannelUser[];
+}
+
+@Entity()
+export class ChannelUser extends BaseEntity {
+	@ManyToOne(() => Channel, (c) => c.channelUsers, { onDelete: "CASCADE" })
+	@JoinColumn()
+	channel: Channel;
+
+	@ManyToOne(() => User, { onDelete: "CASCADE" })
+	@JoinColumn()
+	user: User;
+}
+
+@Entity()
+export class News extends BaseEntity {
+	@Column()
+	title: string;
+
+	@Column("text")
+	content: string;
+
+	@Column({ type: "timestamp with time zone" })
+	startsAt: Date;
+
+	@Column({ type: "timestamp with time zone", nullable: true })
+	endsAt: Date | null;
+
+	@ManyToOne(() => Channel)
+	channel: Channel;
+
+	@ManyToOne(() => User)
+	author: User;
 }
