@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import { HeroUIProvider } from "@heroui/react";
+import { Inter } from "next/font/google";
 
 import "./globals.css";
 
 export const metadata: Metadata = {
 	title: "InfoTrack",
+	description: "Система доведения информации до студентов",
 };
+
+const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({
 	children,
@@ -15,7 +19,9 @@ export default function RootLayout({
 	return (
 		<HeroUIProvider>
 			<html lang="ru">
-				<body className={`antialiased`}>{children}</body>
+				<body className={`${inter.className} antialiased bg-gray-50`}>
+					{children}
+				</body>
 			</html>
 		</HeroUIProvider>
 	);

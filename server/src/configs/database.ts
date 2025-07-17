@@ -15,13 +15,13 @@ export const AppDataSource = new DataSource({
 	database: process.env.DATABASE_NAME,
 	entities:
 		process.env.MODE === "development"
-			? ["src/models/**/*.model.ts"]
-			: ["dist/models/**/*.model.js"],
+			? ["src/entities.ts"]
+			: ["dist/entities.js"],
 	subscribers: [],
 	migrations: [],
 	logging: ["error", "warn"],
 	logger: "simple-console",
-	maxQueryExecutionTime: 1000,
+	maxQueryExecutionTime: 3000,
 	synchronize: true,
 	dropSchema: false,
 	applicationName: "info-track",

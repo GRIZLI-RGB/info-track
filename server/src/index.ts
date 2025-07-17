@@ -3,7 +3,8 @@ import cors from "cors";
 
 import env from "./configs/env";
 import database from "./configs/database";
-import router from "./configs/router";
+
+import router from "./routes";
 
 import "reflect-metadata";
 
