@@ -119,7 +119,15 @@
 // 	responseDate: Date;
 // }
 
-import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from "typeorm";
+import {
+	Entity,
+	Column,
+	ManyToOne,
+	OneToMany,
+	JoinColumn,
+	Unique,
+	CreateDateColumn,
+} from "typeorm";
 import { BaseEntity } from "./configs/database";
 
 @Entity()
@@ -182,4 +190,17 @@ export class News extends BaseEntity {
 
 	@ManyToOne(() => User)
 	author: User;
+}
+
+@Entity()
+@Unique(["user", "news"])
+export class NewsConfirmation extends BaseEntity {
+	@ManyToOne(() => User, { eager: true })
+	user: User;
+
+	@ManyToOne(() => News, { eager: true })
+	news: News;
+
+	@CreateDateColumn()
+	confirmedAt: Date;
 }

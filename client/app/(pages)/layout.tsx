@@ -48,6 +48,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 			fetchUser();
 		} else {
 			setUserState({ data: null, loading: false, error: null });
+
+			if (
+				!pathname.startsWith("/authorization") &&
+				!pathname.startsWith("/public") &&
+				!pathname.startsWith("/_next")
+			) {
+				router.replace("/authorization");
+			}
 		}
 	}, [pathname]);
 

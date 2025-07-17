@@ -2,9 +2,18 @@
 
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import { Button, Input, Textarea, DatePicker, CalendarDate } from "@heroui/react";
+import {
+	Button,
+	Input,
+	Textarea,
+	DatePicker,
+	CalendarDate,
+} from "@heroui/react";
+import { getLocalTimeZone } from "@internationalized/date";
 
 import api from "@/app/utils/api";
+import { useAtomValue } from "jotai";
+import { userAtom } from "@/app/utils/store";
 
 export default function CreateNewsPage() {
 	const { id: channelId } = useParams();
@@ -13,6 +22,7 @@ export default function CreateNewsPage() {
 	const [startsAt, setStartsAt] = useState<CalendarDate | null>(null);
 	const [endsAt, setEndsAt] = useState<CalendarDate | null>(null);
 	const [success, setSuccess] = useState(false);
+	const user = useAtomValue(userAtom);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -21,9 +31,9 @@ export default function CreateNewsPage() {
 			title,
 			content,
 			channelId,
-			startsAt,
-			endsAt,
-			authorId: localStorage.getItem("userId"),
+			startsAt: startsAt!.toDate(getLocalTimeZone()),
+			endsAt: endsAt ? endsAt.toDate(getLocalTimeZone()) : null,
+			authorId: user.data?.id || 0,
 		});
 
 		setSuccess(true);
